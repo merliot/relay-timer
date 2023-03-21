@@ -1,7 +1,8 @@
-// This is an example of an NTP client.
+// This is an timer-based relay controller
 //
 // It creates a UDP connection to request the current time and parse the
 // response from a NTP server.  The system time is set to NTP time.
+// The relay is turned on at startHHMM and turned off at stopHHMM.
 
 package main
 
@@ -22,7 +23,6 @@ var (
 	pass string
 	startHHMM string
 	stopHHMM string
-	// IP address of the server aka "hub". Replace with your own info.
 	ntpHost string = "0.pool.ntp.org:123"
 )
 
@@ -37,7 +37,8 @@ var relay = machine.D4
 
 func main() {
 
-	waitSerial()
+	//waitSerial()
+	time.Sleep(2 * time.Second)
 
 	relay.Configure(machine.PinConfig{machine.PinOutput})
 	relayOff()
@@ -51,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	println("Requesting NTP time...")
+	message("Requesting NTP time...")
 
 	now, err := getCurrentTime(conn)
 	if err != nil {
@@ -108,7 +109,7 @@ func isCurrentTimeBetween(start, stop string) bool {
 }
 
 func relayOn() {
-	println("Relay ON")
+	message("Relay ON")
 	relay.High()
 	if startTimer != nil {
 		startTimer.Reset(24 * time.Hour)
@@ -116,7 +117,7 @@ func relayOn() {
 }
 
 func relayOff() {
-	println("Relay OFF")
+	message("Relay OFF")
 	relay.Low()
 	if stopTimer != nil {
 		stopTimer.Reset(24 * time.Hour)
@@ -140,7 +141,7 @@ func newTimer(when string, f func()) *time.Timer {
 		then = then.Add(24 * time.Hour) // add 24 hours to "then" if it's already passed today
 	}
 	wait := then.Sub(now)
-	fmt.Printf("firing in %s\r\n", wait)
+	message("firing in %s", wait)
 	return time.AfterFunc(wait, f)
 }
 
