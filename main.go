@@ -112,7 +112,7 @@ func relayOn() {
 	message("Relay ON")
 	relay.High()
 	if startTimer != nil {
-		startTimer.Reset(24 * time.Hour)
+		startTimer.Reset((23 * time.Hour) + (50 * time.Minute))
 	}
 }
 
@@ -120,7 +120,7 @@ func relayOff() {
 	message("Relay OFF")
 	relay.Low()
 	if stopTimer != nil {
-		stopTimer.Reset(24 * time.Hour)
+		stopTimer.Reset((23 * time.Hour) + (50 * time.Minute))
 	}
 }
 
